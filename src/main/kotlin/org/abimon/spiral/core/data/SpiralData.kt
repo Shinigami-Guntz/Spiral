@@ -21,13 +21,19 @@ import org.abimon.spiral.core.put
 import org.abimon.spiral.core.utils.TriFace
 import org.abimon.spiral.core.utils.Vertex
 import org.abimon.spiral.modding.IPlugin
-import org.abimon.spiral.mvc.gurren.Gurren
+import org.abimon.spiral.mvc.SpiralModel
 import org.abimon.visi.lang.make
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.math.BigInteger
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
+import java.nio.file.StandardOpenOption
+import java.security.MessageDigest
 
 object SpiralData {
     val billingDead = true
-    val JENKINS_PATH = "http://jenkins.abimon.org:8666"
+    val JENKINS_PATH = "http://jenkins-ci.abimon.org:8666"
     val JENKINS_PROJECT_NAME = "SPIRAL"
     val JENKINS_PROJECT_FILE = "SPIRAL-all.jar"
 
@@ -273,7 +279,31 @@ object SpiralData {
             .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
             .setDefaultSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY))
 
-    val LOGGER = LoggerFactory.getLogger("Spiral v${Gurren.version}")
+    val version: String? by lazy {
+        val file = File(SpiralModel::class.java.protectionDomain.codeSource.location.path)
+        if (!file.isFile)
+            return@lazy null
+
+        val md = MessageDigest.getInstance("MD5")
+
+        val channel = FileChannel.open(file.toPath(), StandardOpenOption.READ)
+        val buffer = ByteBuffer.allocate(8192)
+
+        while (channel.isOpen) {
+            val read = channel.read(buffer)
+            if (read <= 0)
+                break
+
+
+            buffer.flip()
+            md.update(buffer)
+            buffer.rewind()
+        }
+
+        return@lazy String.format("%032x", BigInteger(1, md.digest()))
+    }
+
+    val LOGGER = LoggerFactory.getLogger("Spiral v${version ?: "Developer"}")
 
     val STEAM_DANGANRONPA_TRIGGER_HAPPY_HAVOC = "413410"
     val STEAM_DANGANRONPA_2_GOODBYE_DESPAIR = "413420"
@@ -285,6 +315,7 @@ object SpiralData {
         override fun enable(imperator: Imperator) {}
         override fun disable(imperator: Imperator) {}
     }
+
 
     val cube = SRDIMesh(
             arrayOf(Vertex(1f, 1f, -1f), Vertex(1f, -1f, -1f), Vertex(-1f, -1f, -1f), Vertex(-1f, 1f, -1f), Vertex(1f, 1f, 1f), Vertex(1f, -1f, 1f), Vertex(-1f, -1f, 1f), Vertex(-1f, 1f, 1f)),
