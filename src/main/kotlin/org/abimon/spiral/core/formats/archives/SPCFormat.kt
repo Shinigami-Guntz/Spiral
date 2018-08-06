@@ -11,7 +11,6 @@ import org.abimon.spiral.core.objects.game.DRGame
 import org.abimon.spiral.core.objects.models.SRDIModel
 import org.abimon.spiral.core.objects.models.collada.ColladaPojo
 import org.abimon.spiral.core.utils.*
-import org.abimon.spiral.mvc.SpiralModel
 import org.abimon.spiral.util.decompress
 import org.abimon.visi.lang.replaceLast
 import java.io.InputStream

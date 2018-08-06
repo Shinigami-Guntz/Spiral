@@ -1,0 +1,125 @@
+package org.abimon.spiral.mvc.gurren.imperator
+
+import org.abimon.osl.AllButMatcher
+import org.abimon.osl.SpiralParser
+import org.parboiled.Action
+import org.parboiled.Parboiled
+import org.parboiled.Rule
+import org.parboiled.annotations.BuildParseTree
+import org.parboiled.support.Var
+
+@BuildParseTree
+open class ImperatorParser(parboiled: Boolean) : SpiralParser(parboiled) {
+    companion object {
+        operator fun invoke(): ImperatorParser = Parboiled.createParser(ImperatorParser::class.java, true)
+    }
+
+    open fun Parameter(): Rule {
+        val str = Var<String>()
+
+        return FirstOf(
+                Sequence(
+                        "\"",
+                        Action<Any> { str.set("") },
+                        Optional(
+                                OneOrMore(
+                                        FirstOf(
+                                                Sequence(
+                                                        "\\",
+                                                        FirstOf(
+                                                                Sequence(
+                                                                        FirstOf(
+                                                                                "\"",
+                                                                                "\\",
+                                                                                "/",
+                                                                                "b",
+                                                                                "f",
+                                                                                "n",
+                                                                                "r",
+                                                                                "t"
+                                                                        ),
+                                                                        Action<Any> {
+                                                                            when (match()) {
+                                                                                "\"" -> str.set(str.get() + "\"")
+                                                                                "\\" -> str.set(str.get() + "\\")
+                                                                                "/" -> str.set(str.get() + "/")
+                                                                                "b" -> str.set(str.get() + "\b")
+                                                                                "f" -> str.set(str.get() + 0xC.toChar())
+                                                                                "n" -> str.set(str.get() + "\n")
+                                                                                "r" -> str.set(str.get() + "\r")
+                                                                                "t" -> str.set(str.get() + "\t")
+                                                                            }
+
+                                                                            return@Action true
+                                                                        }
+                                                                ),
+                                                                Sequence(
+                                                                        "u",
+                                                                        NTimes(4, Digit(16)),
+                                                                        Action<Any> { str.set(str.get() + match().toInt(16).toChar()) }
+                                                                )
+                                                        )
+                                                ),
+                                                Sequence(
+                                                        AllButMatcher(charArrayOf('\\', '"')),
+                                                        Action<Any> { str.set(str.get() + match()) }
+                                                )
+                                        )
+                                )
+                        ),
+                        Action<Any> { push(str.get()) },
+                        "\""
+                ),
+                Sequence(
+                        Action<Any> { str.set("") },
+                        Optional(
+                                OneOrMore(
+                                        FirstOf(
+                                                Sequence(
+                                                        "\\",
+                                                        FirstOf(
+                                                                Sequence(
+                                                                        FirstOf(
+                                                                                "\"",
+                                                                                "\\",
+                                                                                "/",
+                                                                                "b",
+                                                                                "f",
+                                                                                "n",
+                                                                                "r",
+                                                                                "t"
+                                                                        ),
+                                                                        Action<Any> {
+                                                                            when (match()) {
+                                                                                "\"" -> str.set(str.get() + "\"")
+                                                                                "\\" -> str.set(str.get() + "\\")
+                                                                                "/" -> str.set(str.get() + "/")
+                                                                                "b" -> str.set(str.get() + "\b")
+                                                                                "f" -> str.set(str.get() + 0xC.toChar())
+                                                                                "n" -> str.set(str.get() + "\n")
+                                                                                "r" -> str.set(str.get() + "\r")
+                                                                                "t" -> str.set(str.get() + "\t")
+                                                                            }
+
+                                                                            return@Action true
+                                                                        }
+                                                                ),
+                                                                Sequence(
+                                                                        "u",
+                                                                        NTimes(4, Digit(16)),
+                                                                        Action<Any> { str.set(str.get() + match().toInt(16).toChar()) }
+                                                                )
+                                                        )
+                                                ),
+                                                Sequence(
+                                                        AllButMatcher(whitespace.plus('\\')),
+                                                        Action<Any> { str.set(str.get() + match()) }
+                                                )
+                                        )
+                                )
+                        ),
+                        Action<Any> { push(str.get()) }
+                )
+        )
+    }
+}

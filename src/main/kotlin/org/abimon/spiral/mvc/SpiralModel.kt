@@ -8,31 +8,22 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import org.abimon.imperator.handle.Imperator
 import org.abimon.imperator.impl.BasicImperator
-import org.abimon.imperator.impl.InstanceOrder
-import org.abimon.imperator.impl.InstanceSoldier
-import org.abimon.imperator.impl.InstanceWatchtower
 import org.abimon.spiral.core.data.ModelConfig
 import org.abimon.spiral.core.data.PatchOperation
 import org.abimon.spiral.core.data.SpiralData
 import org.abimon.spiral.core.userAgent
 import org.abimon.spiral.modding.HookManager
-import org.abimon.visi.lang.splitOutsideGroup
-import org.abimon.visi.security.md5Hash
+import org.abimon.spiral.mvc.gurren.imperator.ImperatorParser
 import java.io.File
-import java.math.BigInteger
-import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
-import java.nio.file.StandardOpenOption
-import java.security.MessageDigest
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates
 import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
-import kotlin.system.measureNanoTime
 
 object SpiralModel {
+    val imperatorParser: ImperatorParser = ImperatorParser()
     val imperator: Imperator = BasicImperator()
 
     val archives: MutableSet<File> = ConcurrentSkipListSet()
@@ -61,14 +52,6 @@ object SpiralModel {
 
     private val pluginData: MutableMap<String, Any?> = HashMap()
     private val unsafe: AtomicBoolean = AtomicBoolean(false)
-
-    fun Command(commandName: String, scope: String? = null, command: (Pair<Array<String>, String>) -> Unit): InstanceSoldier<InstanceOrder<*>> {
-        return InstanceSoldier<InstanceOrder<*>>(InstanceOrder::class.java, commandName, arrayListOf(InstanceWatchtower<InstanceOrder<*>> {
-            return@InstanceWatchtower (scope == null || SpiralModel.scope.second == scope) &&
-                    it.data is String &&
-                    ((it.data as String).splitOutsideGroup().firstOrNull() ?: "") == commandName
-        })) { command((it.data as String).splitOutsideGroup() to it.data as String) }
-    }
 
     private val JSON_CONFIG = File("config.json")
     private val YAML_CONFIG = File("config.yaml")
