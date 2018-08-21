@@ -22,6 +22,8 @@ data class ModelConfig(
         val noFluffIO: Boolean = false, //Disable hooks, disable percentages, just extract and compile at maximum speeds
         val multithreadedSimple: Boolean = false, //Do we use multiple threads to extract for regular operations (no conversions)
 
+        val tableOutput: Boolean = true, //Do we print output to a table?
+
         val defaultParams: Map<String, Any?> = emptyMap(), //Default parameters supplied to formats for conversion
         val pluginData: Map<String, Any?> = emptyMap() //Data stored by plugins
 )
