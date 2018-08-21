@@ -10,6 +10,7 @@ import org.abimon.spiral.util.decompressWithFormats
 import org.abimon.visi.io.errPrintln
 import java.io.File
 
+@Suppress("unused")
 object Gurren : CommandClass {
     /** Helper Variables */
     var keepLooping = true
@@ -49,12 +50,18 @@ object Gurren : CommandClass {
             if (format != null) {
                 //The file has an identifiable format.
 
+                //Should result in something like DRVita > V3 > SPC >
                 val compressionString = if (compressionMethods.isEmpty()) "" else compressionMethods.joinToString(" > ", postfix = " > ")
+
+                //This concatenates them together, which will be something like DRVita > V3 > SPC > SRD, or just SRD if it's uncompressed
                 val formatString = "${compressionString}${format.name}"
+
+                //Print it all out
                 if (SpiralModel.tableOutput) {
                     println(FlipTable.of(arrayOf("File", "Format"), arrayOf(arrayOf(file.absolutePath, formatString))))
                 } else {
-
+                    println("Identified ${file.absolutePath}")
+                    println("Format: $formatString")
                 }
             }
         }

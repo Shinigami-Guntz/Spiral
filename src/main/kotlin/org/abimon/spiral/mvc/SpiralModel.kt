@@ -91,6 +91,8 @@ object SpiralModel {
 
             attemptFingerprinting = config.attemptFingerprinting
 
+            tableOutput = config.tableOutput
+
             defaultParams.clear()
             defaultParams.putAll(config.defaultParams)
 
@@ -118,7 +120,8 @@ object SpiralModel {
         get() = ModelConfig(
                 archives.map { it.absolutePath }.toSet(), loggerLevel.levelStr, concurrentOperations, scope, operating?.absolutePath, autoConfirm, purgeCache,
                 patchOperation, patchFile?.absolutePath, fileOperation?.absolutePath,
-                attemptFingerprinting, true, true, false, false, defaultParams, pluginData
+                attemptFingerprinting, true, true, false, false,
+                tableOutput, defaultParams, pluginData
         )
 
     init {
