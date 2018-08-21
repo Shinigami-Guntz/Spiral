@@ -50,10 +50,22 @@ open class OBJParser(isParboiledCreated: Boolean) : SpiralParser(isParboiledCrea
             Vertex(),
             UV(),
             Face(),
-            ZeroOrMore(LineMatcher),
+            TodoFormatLines(),
             EOI
     )
 
+    open fun TodoFormatLines(): Rule = Sequence(
+            FirstOf(
+                    'l',
+                    "mtllib",
+                    "usemtl",
+                    'o',
+                    'g',
+                    's'
+            ),
+            InlineWhitespace(),
+            ZeroOrMore(LineMatcher)
+    )
 
     open fun Vertex(): Rule = Sequence(
             clearTmpStack(VERTEX_ID),
