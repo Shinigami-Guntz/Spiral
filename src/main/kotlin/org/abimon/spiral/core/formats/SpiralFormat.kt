@@ -10,8 +10,8 @@ interface SpiralFormat {
     val extension: String?
     val conversions: Array<SpiralFormat>
 
-    fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean
-    fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = isFormat(game, name, context, dataSource) to 1.0
+    fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = isFormatWithConfidence(game, name, context, dataSource).first
+    fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double>
     fun canConvert(game: DRGame?, format: SpiralFormat): Boolean = format in conversions || canConvertViaOverride(game, format)
     fun canConvertViaOverride(game: DRGame?, format: SpiralFormat): Boolean = OVERRIDING_CONVERSIONS.containsKey(game to this and format)
 
@@ -42,8 +42,7 @@ interface SpiralFormat {
         override val extension = null
         override val conversions: Array<SpiralFormat> = emptyArray()
 
-        override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = false
-
+        override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = false to 1.0
     }
 
     object BinaryFormat : SpiralFormat {
@@ -51,7 +50,7 @@ interface SpiralFormat {
         override val extension = null
         override val conversions: Array<SpiralFormat> = emptyArray()
 
-        override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = true
+        override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = true to 0.0 //Last bet
     }
 
     companion object {

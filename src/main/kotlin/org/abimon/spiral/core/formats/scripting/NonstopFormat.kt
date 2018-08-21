@@ -15,9 +15,12 @@ object NonstopFormat: SpiralFormat {
     override val extension: String = "dat"
     override val conversions: Array<SpiralFormat> = arrayOf(OpenSpiralLanguageFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean =
-            NonstopDebate(game as? HopesPeakKillingGame
-                    ?: UnknownHopesPeakGame, dataSource)?.sections?.isNotEmpty() == true
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
+        val nonstop = NonstopDebate(game as? HopesPeakKillingGame
+                ?: UnknownHopesPeakGame, dataSource) ?: return false to 1.0
+
+        return nonstop.sections.isNotEmpty() to 0.5
+    }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {
         if(super.convert(game, format, name, context, dataSource, output, params)) return true

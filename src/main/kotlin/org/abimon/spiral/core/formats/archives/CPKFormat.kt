@@ -13,11 +13,15 @@ object CPKFormat: SpiralFormat {
     override val extension: String = "cpk"
     override val conversions: Array<SpiralFormat> = arrayOf(ZIPFormat, WADFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         try {
-            return CPK(dataSource).files.isNotEmpty()
+            val cpk = CPK(dataSource)
+
+            if (cpk.files.size == 1)
+                return true to 0.75
+            return cpk.files.isNotEmpty() to 1.0
         } catch(iea: IllegalArgumentException) {
-            return false
+            return false to 1.0
         }
     }
 

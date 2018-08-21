@@ -10,5 +10,5 @@ object PakBGFormats: SpiralFormat {
     override val conversions: Array<SpiralFormat> = emptyArray()
     private val NAME_REGEX = "bg_.+_(file|opt|place)\\.dat".toRegex()
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = name?.matches(NAME_REGEX) == true
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = (name?.matches(NAME_REGEX) == true) to 0.4
 }

@@ -14,15 +14,15 @@ object ColladaModelFormat : SpiralFormat {
     override val extension: String? = "dae"
     override val conversions: Array<SpiralFormat> = emptyArray()
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         try {
             dataSource().use { stream -> SpiralData.XML_MAPPER.readValue(stream, ColladaPojo::class.java) }
-            return true
+            return true to 1.0 //This could be a bit better honestly, but it'll do
         } catch (json: JsonParseException) {
         } catch (json: JsonMappingException) {
         } catch (io: CharConversionException) {
         }
 
-        return false
+        return false to 1.0
     }
 }

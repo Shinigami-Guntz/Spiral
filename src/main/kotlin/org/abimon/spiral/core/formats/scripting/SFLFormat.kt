@@ -10,5 +10,5 @@ object SFLFormat: SpiralFormat {
     override val extension: String? = "sfl"
     override val conversions: Array<SpiralFormat> = emptyArray()
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = dataSource().use { stream -> stream.readString(4) == "LLFS" }
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = dataSource().use { stream -> stream.readString(4) == "LLFS" } to 1.0
 }

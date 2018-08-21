@@ -11,6 +11,7 @@ import javax.imageio.ImageIO
 
 interface SpiralImageFormat : SpiralFormat {
     override fun canConvert(game: DRGame?, format: SpiralFormat): Boolean = format is SpiralImageFormat || super.canConvert(game, format)
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = isFormat(game, name, context, dataSource) to 1.0
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {
         if (super.convert(game, format, name, context, dataSource, output, params))

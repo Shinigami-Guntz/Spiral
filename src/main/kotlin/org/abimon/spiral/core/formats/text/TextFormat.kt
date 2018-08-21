@@ -11,5 +11,5 @@ object TextFormat: SpiralFormat {
     val manualConversions: Array<SpiralFormat> = arrayOf(STXFormat) //But we should allow manual conversions
 
     override fun canConvert(game: DRGame?, format: SpiralFormat): Boolean = format in manualConversions
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = true
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> = true to 0.1
 }

@@ -26,12 +26,15 @@ object SPCFormat : SpiralFormat {
     override val conversions: Array<SpiralFormat> = arrayOf(ZIPFormat, OBJModelFormat)
     val decimalFormat = DecimalFormat("#.####")
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         try {
-            return SPC(dataSource).files.isNotEmpty()
+            val spc = SPC(dataSource)
+            if (spc.files.size == 1)
+                return true to 0.75
+            return spc.files.isNotEmpty() to 1.0
         } catch (e: IllegalArgumentException) {
+            return false to 1.0
         }
-        return false
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {

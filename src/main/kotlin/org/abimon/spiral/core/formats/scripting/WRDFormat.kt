@@ -20,13 +20,13 @@ object WRDFormat : SpiralFormat {
     val STRING_OP_CODE = 0x2B1E
     val STRING_OP_CODE_HEX = STRING_OP_CODE.toString(16)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         try {
-            return game === V3 && WordScriptFile(game, dataSource).entries.isNotEmpty()
+            return (game === V3 && WordScriptFile(game, dataSource).entries.isNotEmpty()) to 0.9
         } catch(illegal: IllegalArgumentException) {
         } catch(negative: NegativeArraySizeException) {
         }
-        return false
+        return false to 1.0
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {

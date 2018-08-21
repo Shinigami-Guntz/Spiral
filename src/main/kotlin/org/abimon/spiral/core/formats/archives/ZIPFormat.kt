@@ -14,9 +14,7 @@ import org.abimon.spiral.core.objects.customWAD
 import org.abimon.spiral.core.objects.game.DRGame
 import org.abimon.spiral.core.objects.models.SRDIModel
 import org.abimon.spiral.core.objects.models.collada.ColladaPojo
-import org.abimon.spiral.core.readInt
 import org.abimon.spiral.core.utils.*
-import org.abimon.spiral.mvc.SpiralModel
 import org.abimon.spiral.util.toInt
 import org.abimon.visi.util.zip.forEach
 import java.io.*
@@ -40,22 +38,8 @@ object ZIPFormat : SpiralFormat {
             toInt(byteArrayOf(0x50, 0x4B, 0x07, 0x08), little = true)
     )
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
-//        try {
-//            return source.use { stream ->
-//                val zip = ZipInputStream(stream)
-//                var count = 0
-//                while (zip.nextEntry != null)
-//                    count++
-//                zip.close()
-//                return@use count > 0
-//            }
-//        } catch (e: NullPointerException) {
-//        } catch (e: IOException) {
-//        }
-
-
-        return dataSource().use { stream -> stream.readInt(little = true).toInt() in VALID_HEADERS }
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
+        return dataSource().use { stream -> stream.readInt32LE() in VALID_HEADERS } to 0.75
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {

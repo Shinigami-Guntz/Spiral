@@ -18,12 +18,14 @@ object IVFFormat : SpiralFormat {
     val initialHeader = byteArrayOfInts(0x44, 0x4B, 0x49, 0x46)
     val secondHeader = byteArrayOfInts(0x56, 0x50, 0x38, 0x30)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = dataSource().use { stream ->
-        if (!Arrays.equals(stream.read(4), initialHeader))
-            return@use false
-        stream.skipBytes(4)
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
+        return dataSource().use { stream ->
+            if (!Arrays.equals(stream.read(4), initialHeader))
+                return@use false to 1.0
+            stream.skipBytes(4)
 
-        return@use Arrays.equals(stream.read(4), secondHeader)
+            return@use Arrays.equals(stream.read(4), secondHeader) to 1.0
+        }
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {

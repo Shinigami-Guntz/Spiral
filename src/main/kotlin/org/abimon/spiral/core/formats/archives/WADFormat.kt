@@ -15,8 +15,13 @@ object WADFormat : SpiralFormat {
     override val extension = "wad"
     override val conversions: Array<SpiralFormat> = arrayOf(ZIPFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
-        return WAD(dataSource)?.files?.isNotEmpty() == true
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
+        val wad = WAD(dataSource) ?: return false to 1.0
+
+        if (wad.files.size == 1 && name?.endsWith("pak") != true)
+            return true to 0.75
+
+        return wad.files.isNotEmpty() to 1.0
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {

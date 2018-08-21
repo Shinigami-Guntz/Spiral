@@ -3,9 +3,13 @@ package org.abimon.spiral.core.formats.scripting
 import org.abimon.spiral.core.formats.SpiralFormat
 import org.abimon.spiral.core.objects.UnsafeLin
 import org.abimon.spiral.core.objects.game.DRGame
+import org.abimon.spiral.core.objects.game.hpa.DR1
+import org.abimon.spiral.core.objects.game.hpa.DR2
 import org.abimon.spiral.core.objects.game.hpa.HopesPeakDRGame
 import org.abimon.spiral.core.objects.scripting.Lin
 import org.abimon.spiral.core.objects.scripting.lin.LinTextScript
+import org.abimon.spiral.core.objects.scripting.lin.StopScriptEntry
+import org.abimon.spiral.core.objects.scripting.lin.TextCountEntry
 import org.abimon.spiral.core.println
 import java.io.InputStream
 import java.io.OutputStream
@@ -15,13 +19,22 @@ object LINFormat : SpiralFormat {
     override val extension = "lin"
     override val conversions: Array<SpiralFormat> = arrayOf(OpenSpiralLanguageFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         try {
-            return Lin(game as? HopesPeakDRGame ?: return false, dataSource)?.entries?.isNotEmpty() == true
+            val lin = Lin(game as? HopesPeakDRGame ?: return false to 1.0, dataSource) ?: return false to 1.0
+
+            if (lin.entries.isEmpty())
+                return false to 1.0
+            when (lin.game) {
+                DR1 -> if (lin.entries.first() is TextCountEntry && lin.entries.last() is StopScriptEntry) return true to 1.0
+                DR2 -> if (lin.entries.first() is TextCountEntry && lin.entries.last() is StopScriptEntry) return true to 1.0
+            }
+
+            return true to 0.75
         } catch (illegal: IllegalArgumentException) {
         } catch (negative: NegativeArraySizeException) {
         }
-        return false
+        return false to 1.0
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {

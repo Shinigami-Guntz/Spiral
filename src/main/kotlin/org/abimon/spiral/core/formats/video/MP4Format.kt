@@ -20,16 +20,18 @@ object MP4Format: SpiralFormat {
     val chunkTypes = arrayOf("ftyp", "mdat", "moov", "pnot", "udta", "uuid", "moof", "free", "skip", "jP2 ", "wide", "load", "ctab", "imap", "matt", "kmat", "clip", "crgn", "sync", "chap", "tmcd", "scpt", "ssrc", "PICT")
     val subtypes = arrayOf("avc1", "iso2", "isom", "mmp4", "mp41", "mp42", "mp71", "msnv", "ndas", "ndsc", "ndsh", "ndsm", "ndsp", "ndss", "ndxc", "ndxh", "ndxm", "ndxp", "ndxs")
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = dataSource().use { stream ->
-        stream.skipBytes(4)
-        val chunkType = stream.readString(4)
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
+        return dataSource().use { stream ->
+            stream.skipBytes(4)
+            val chunkType = stream.readString(4)
 
-        if(chunkType != "ftyp")
-            return@use false
+            if (chunkType != "ftyp")
+                return@use false to 1.0
 
-        val subtype = stream.readString(4)
+            val subtype = stream.readString(4)
 
-        return@use subtype in subtypes
+            return@use (subtype in subtypes) to 1.0
+        }
     }
 
     //override fun canConvert(format: SpiralFormat): Boolean = super.canConvert(format) && MediaWrapper.ffmpeg.isInstalled

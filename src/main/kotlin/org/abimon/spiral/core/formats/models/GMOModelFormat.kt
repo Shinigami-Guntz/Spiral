@@ -15,7 +15,9 @@ object GMOModelFormat: SpiralFormat {
     override val extension: String? = "gmo"
     override val conversions: Array<SpiralFormat> = arrayOf(OBJModelFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean = dataSource().use { stream -> stream.readString(12) == "OMG.00.1PSP\u0000" }
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
+        return dataSource().use { stream -> stream.readString(12) == "OMG.00.1PSP\u0000" } to 1.0
+    }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {
         if(super.convert(game, format, name, context, dataSource, output, params)) return true

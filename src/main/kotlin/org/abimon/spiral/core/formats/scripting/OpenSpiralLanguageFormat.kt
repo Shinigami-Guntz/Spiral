@@ -27,7 +27,7 @@ object OpenSpiralLanguageFormat: SpiralFormat {
     override val extension: String = "osl"
     override val conversions: Array<SpiralFormat> = arrayOf(LINFormat, WRDFormat, STXFormat, NonstopFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         val text = String(dataSource().use { stream -> stream.readBytes() }, Charsets.UTF_8)
 
         val parser = OpenSpiralLanguageParser { fileName -> context(fileName)?.invoke()?.use { stream -> stream.readBytes() }}
@@ -37,7 +37,7 @@ object OpenSpiralLanguageFormat: SpiralFormat {
         parser["OS"] = EnumOS.determineOS().name
 
         val result = parser.parse(text)
-        return !result.hasErrors() && !result.valueStack.isEmpty
+        return (!result.hasErrors() && !result.valueStack.isEmpty) to 1.0
     }
 
     @Suppress("UNCHECKED_CAST")

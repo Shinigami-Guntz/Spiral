@@ -11,9 +11,9 @@ object OBJModelFormat: SpiralFormat {
     override val extension: String? = "obj"
     override val conversions: Array<SpiralFormat> = emptyArray()
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         val model = OBJModel(InputStreamFuncDataSource(dataSource))
 
-        return (model.vertices.isNotEmpty() && model.faces.isNotEmpty()) || (model.uvs.isNotEmpty() && model.faces.isNotEmpty())
+        return ((model.vertices.isNotEmpty() && model.faces.isNotEmpty()) || (model.uvs.isNotEmpty() && model.faces.isNotEmpty())) to 1.0
     }
 }

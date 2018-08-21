@@ -13,12 +13,12 @@ object STXFormat : SpiralFormat {
     override val extension = "stx"
     override val conversions: Array<SpiralFormat> = arrayOf(OpenSpiralLanguageFormat)
 
-    override fun isFormat(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Boolean {
+    override fun isFormatWithConfidence(game: DRGame?, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream): Pair<Boolean, Double> {
         try {
-            return STXT(dataSource).strings.isNotEmpty()
+            return STXT(dataSource).strings.isNotEmpty() to 1.0
         } catch(illegal: IllegalArgumentException) {
         }
-        return false
+        return false to 1.0
     }
 
     override fun convert(game: DRGame?, format: SpiralFormat, name: String?, context: (String) -> (() -> InputStream)?, dataSource: () -> InputStream, output: OutputStream, params: Map<String, Any?>): Boolean {
