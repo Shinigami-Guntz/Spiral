@@ -7,6 +7,7 @@ import org.parboiled.Parboiled
 import org.parboiled.Rule
 import org.parboiled.annotations.BuildParseTree
 import org.parboiled.support.Var
+import java.io.File
 
 @BuildParseTree
 open class ImperatorParser(parboiled: Boolean) : SpiralParser(parboiled) {
@@ -122,4 +123,57 @@ open class ImperatorParser(parboiled: Boolean) : SpiralParser(parboiled) {
                 )
         )
     }
+
+    open fun ParameterNoEscapes(): Rule {
+        val str = Var<String>()
+
+        return FirstOf(
+                Sequence(
+                        "\"",
+                        Action<Any> { str.set("") },
+                        Optional(
+                                OneOrMore(
+                                        FirstOf(
+                                                Sequence(
+                                                        "\\",
+                                                        "\"",
+                                                        Action<Any> { str.set(str.get() + "\"") }
+                                                ),
+                                                Sequence(
+                                                        AllButMatcher(charArrayOf('"')),
+                                                        Action<Any> { str.set(str.get() + match()) }
+                                                )
+                                        )
+                                )
+                        ),
+                        Action<Any> { push(str.get()) },
+                        "\""
+                ),
+                Sequence(
+                        Action<Any> { str.set("") },
+                        Optional(
+                                OneOrMore(
+                                        FirstOf(
+                                                Sequence(
+                                                        "\\",
+                                                        "\"",
+                                                        Action<Any> { str.set(str.get() + "\"") }
+                                                ),
+                                                Sequence(
+                                                        AllButMatcher(whitespace),
+                                                        Action<Any> { str.set(str.get() + match()) }
+                                                )
+                                        )
+                                )
+                        ),
+                        Action<Any> { push(str.get()) }
+                )
+        )
+    }
+
+    open fun FilePath(): Rule =
+            Sequence(
+                    ParameterNoEscapes(),
+                    Action<Any> { push(File(pop().toString())) }
+            )
 }

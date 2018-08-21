@@ -13,6 +13,7 @@ import org.abimon.spiral.core.objects.archives.CPK
 import org.abimon.spiral.core.objects.archives.CPKFileEntry
 import org.abimon.spiral.core.objects.archives.WAD
 import org.abimon.spiral.core.objects.archives.srd.TXREntry
+import org.abimon.spiral.core.objects.compression.ICompression
 import org.abimon.spiral.core.utils.ChunkProcessingInputStream
 import org.abimon.spiral.core.utils.CountingInputStream
 import org.abimon.spiral.core.utils.WindowedInputStream
@@ -27,7 +28,6 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
 import java.util.regex.Pattern
 import kotlin.reflect.KFunction
 
@@ -247,6 +247,30 @@ fun decompress(dataSource: () -> InputStream): () -> InputStream {
     }
 
     return dataSource
+}
+
+fun decompressWithFormats(dataSource: () -> InputStream): Pair<() -> InputStream, Array<ICompression>> {
+    for (method in SpiralFormats.compressionMethods) {
+        if (method.isCompressed(dataSource)) {
+            if (method.supportsChunking) {
+                val (source, compressedMethods) = decompressWithFormats func@{
+                    val stream = dataSource()
+                    method.prepareChunkStream(stream)
+                    return@func ChunkProcessingInputStream { method.decompressStreamChunk(stream) }
+                }
+
+                return source to Array(compressedMethods.size + 1) { i -> if (i == 0) method else compressedMethods[i - 1] }
+            } else {
+                val data = method.decompress(dataSource)
+
+                val (source, compressedMethods) = decompressWithFormats { ByteArrayInputStream(data) }
+
+                return source to Array(compressedMethods.size + 1) { i -> if (i == 0) method else compressedMethods[i - 1] }
+            }
+        }
+    }
+
+    return dataSource to emptyArray()
 }
 
 fun decompressData(dataSource: () -> InputStream): () -> InputStream = decompress(dataSource)

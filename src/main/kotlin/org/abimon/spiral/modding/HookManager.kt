@@ -1,60 +1,64 @@
 package org.abimon.spiral.modding
 
+import ch.qos.logback.classic.Level
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
+import org.abimon.spiral.core.*
 import org.abimon.spiral.core.archives.IArchive
 import org.abimon.spiral.core.data.PatchOperation
 import org.abimon.spiral.core.data.SpiralData
-import ch.qos.logback.classic.Level
 import java.io.File
 import java.io.InputStream
 
 object HookManager {
-    val BEFORE_OPERATING_CHANGE: MutableList<Pair<IPlugin, (File?, File?, Boolean) -> Boolean>> = ArrayList()
-    val ON_OPERATING_CHANGE: MutableList<Pair<IPlugin, (File?, File?) -> Unit>> = ArrayList()
+    val BEFORE_OPERATING_CHANGE: BeforeHookChangeMutableList<File?> = ArrayList()
+    val ON_OPERATING_CHANGE: OnHookChangeMutableList<File?> = ArrayList()
 
-    val BEFORE_FILE_OPERATING_CHANGE: MutableList<Pair<IPlugin, (File?, File?, Boolean) -> Boolean>> = ArrayList()
-    val ON_FILE_OPERATING_CHANGE: MutableList<Pair<IPlugin, (File?, File?) -> Unit>> = ArrayList()
+    val BEFORE_FILE_OPERATING_CHANGE: BeforeHookChangeMutableList<File?> = ArrayList()
+    val ON_FILE_OPERATING_CHANGE: OnHookChangeMutableList<File?> = ArrayList()
 
-    val BEFORE_SCOPE_CHANGE: MutableList<Pair<IPlugin, (Pair<String, String>, Pair<String, String>, Boolean) -> Boolean>> = ArrayList()
-    val ON_SCOPE_CHANGE: MutableList<Pair<IPlugin, (Pair<String, String>, Pair<String, String>) -> Unit>> = ArrayList()
+    val BEFORE_SCOPE_CHANGE: BeforeHookChangeMutableList<GurrenScope> = ArrayList()
+    val ON_SCOPE_CHANGE: OnHookChangeMutableList<GurrenScope> = ArrayList()
 
-    val BEFORE_LOGGER_LEVEL_CHANGE: MutableList<Pair<IPlugin, (Level, Level, Boolean) -> Boolean>> = ArrayList()
-    val ON_LOGGER_LEVEL_CHANGE: MutableList<Pair<IPlugin, (Level, Level) -> Unit>> = ArrayList()
+    val BEFORE_LOGGER_LEVEL_CHANGE: BeforeHookChangeMutableList<Level> = ArrayList()
+    val ON_LOGGER_LEVEL_CHANGE: OnHookChangeMutableList<Level> = ArrayList()
 
-    val BEFORE_CACHE_ENABLED_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_CACHE_ENABLED_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_CACHE_ENABLED_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_CACHE_ENABLED_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_CONCURRENT_OPERATIONS_CHANGE: MutableList<Pair<IPlugin, (Int, Int, Boolean) -> Boolean>> = ArrayList()
-    val ON_CONCURRENT_OPERATIONS_CHANGE: MutableList<Pair<IPlugin, (Int, Int) -> Unit>> = ArrayList()
+    val BEFORE_CONCURRENT_OPERATIONS_CHANGE: BeforeHookChangeMutableList<Int> = ArrayList()
+    val ON_CONCURRENT_OPERATIONS_CHANGE: OnHookChangeMutableList<Int> = ArrayList()
 
-    val BEFORE_AUTO_CONFIRM_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_AUTO_CONFIRM_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_AUTO_CONFIRM_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_AUTO_CONFIRM_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_PURGE_CACHE_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_PURGE_CACHE_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_PURGE_CACHE_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_PURGE_CACHE_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_PATCH_OPERATION_CHANGE: MutableList<Pair<IPlugin, (PatchOperation?, PatchOperation?, Boolean) -> Boolean>> = ArrayList()
-    val ON_PATCH_OPERATION_CHANGE: MutableList<Pair<IPlugin, (PatchOperation?, PatchOperation?) -> Unit>> = ArrayList()
+    val BEFORE_PATCH_OPERATION_CHANGE: BeforeHookChangeMutableList<PatchOperation?> = ArrayList()
+    val ON_PATCH_OPERATION_CHANGE: OnHookChangeMutableList<PatchOperation?> = ArrayList()
 
-    val BEFORE_PATCH_FILE_CHANGE: MutableList<Pair<IPlugin, (File?, File?, Boolean) -> Boolean>> = ArrayList()
-    val ON_PATCH_FILE_CHANGE: MutableList<Pair<IPlugin, (File?, File?) -> Unit>> = ArrayList()
+    val BEFORE_PATCH_FILE_CHANGE: BeforeHookChangeMutableList<File?> = ArrayList()
+    val ON_PATCH_FILE_CHANGE: OnHookChangeMutableList<File?> = ArrayList()
 
-    val BEFORE_ATTEMPT_FINGERPRINT_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_ATTEMPT_FINGERPRINT_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_ATTEMPT_FINGERPRINT_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_ATTEMPT_FINGERPRINT_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_PRINT_EXTRACT_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_PRINT_EXTRACT_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_PRINT_EXTRACT_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_PRINT_EXTRACT_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_PRINT_COMPILE_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_PRINT_COMPILE_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_PRINT_COMPILE_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_PRINT_COMPILE_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_NO_FLUFF_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_NO_FLUFF_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_NO_FLUFF_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_NO_FLUFF_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
-    val BEFORE_MULTITHREADED_SIMPLE_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean, Boolean) -> Boolean>> = ArrayList()
-    val ON_MULTITHREADED_SIMPLE_CHANGE: MutableList<Pair<IPlugin, (Boolean, Boolean) -> Unit>> = ArrayList()
+    val BEFORE_MULTITHREADED_SIMPLE_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_MULTITHREADED_SIMPLE_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
+
+    val BEFORE_TABLE_OUTPUT_CHANGE: BeforeHookChangeMutableList<Boolean> = ArrayList()
+    val ON_TABLE_OUTPUT_CHANGE: OnHookChangeMutableList<Boolean> = ArrayList()
 
     val BEFORE_EXTRACT: MutableList<Pair<IPlugin, (IArchive, File, List<Pair<String, () -> InputStream>>, Boolean) -> Boolean>> = ArrayList()
     val ON_EXTRACT: MutableList<Pair<IPlugin, (IArchive, File, List<Pair<String, () -> InputStream>>) -> Unit>> = ArrayList()
@@ -107,6 +111,8 @@ object HookManager {
     fun beforeMultithreadedSimpleChange(old: Boolean, new: Boolean): Boolean
             = beforeChange(old, new, BEFORE_MULTITHREADED_SIMPLE_CHANGE)
 
+    fun beforeTableOutputChange(old: Boolean, new: Boolean): Boolean = beforeChange(old, new, BEFORE_TABLE_OUTPUT_CHANGE)
+
     fun afterOperatingChange(old: File?, new: File?): Unit =
             afterChange(old, new, ON_OPERATING_CHANGE)
 
@@ -152,6 +158,8 @@ object HookManager {
     fun afterMultithreadedSimpleChange(old: Boolean, new: Boolean): Unit
             = afterChange(old, new, ON_MULTITHREADED_SIMPLE_CHANGE)
 
+    fun afterTableOutputChange(old: Boolean, new: Boolean): Unit = afterChange(old, new, ON_TABLE_OUTPUT_CHANGE)
+
     fun shouldExtract(archive: IArchive, folder: File, files: List<Pair<String, () -> InputStream>>): Boolean
             = BEFORE_EXTRACT
             .filter { (plugin) -> plugin == SpiralData.BASE_PLUGIN || PluginManager.loadedPlugins.values.any { (_, _, c) -> plugin == c } }
@@ -179,12 +187,12 @@ object HookManager {
             .filter { (plugin) -> plugin == SpiralData.BASE_PLUGIN || PluginManager.loadedPlugins.values.any { (_, _, c) -> plugin == c } }
             .forEach { (_, hook) -> hook(archive, folder, files) }
 
-    fun <T : Any?> beforeChange(old: T, new: T, beforeChanges: List<Pair<IPlugin, (T, T, Boolean) -> Boolean>>): Boolean
+    fun <T : Any?> beforeChange(old: T, new: T, beforeChanges: BeforeHookChangeList<T>): Boolean
             = beforeChanges
             .filter { (plugin) -> plugin == SpiralData.BASE_PLUGIN || PluginManager.loadedPlugins.values.any { (_, _, c) -> plugin == c } }
             .fold(true) { state, (_, hook) -> hook(old, new, state) }
 
-    fun <T : Any?> afterChange(old: T, new: T, afterChanges: List<Pair<IPlugin, (T, T) -> Unit>>): Unit
+    fun <T : Any?> afterChange(old: T, new: T, afterChanges: OnHookChangeList<T>): Unit
             = afterChanges
             .filter { (plugin) -> plugin == SpiralData.BASE_PLUGIN || PluginManager.loadedPlugins.values.any { (_, _, c) -> plugin == c } }
             .forEach { (_, hook) -> hook(old, new) }

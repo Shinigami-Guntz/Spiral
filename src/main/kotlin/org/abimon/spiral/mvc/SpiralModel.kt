@@ -48,6 +48,8 @@ object SpiralModel {
     var noFluffIO: Boolean by hookable(false, HookManager::beforeNoFluffChange, HookManager::afterNoFluffChange)
     var multithreadSimpleOperations: Boolean by hookable(false, HookManager::beforeMultithreadedSimpleChange, HookManager::afterMultithreadedSimpleChange)
 
+    var tableOutput: Boolean by hookable(true, HookManager::beforeTableOutputChange, HookManager::afterTableOutputChange)
+
     val defaultParams: MutableMap<String, Any?> = HashMap()
 
     private val pluginData: MutableMap<String, Any?> = HashMap()

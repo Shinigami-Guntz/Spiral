@@ -3,8 +3,8 @@ package org.abimon.spiral.core
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.kittinunf.fuel.core.Request
 import net.npe.tga.TGAWriter
-import org.abimon.spiral.core.data.SpiralData
 import org.abimon.spiral.core.objects.images.GXTByteColourOrder
+import org.abimon.spiral.modding.IPlugin
 import org.abimon.visi.io.read
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -22,6 +22,24 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.cast
 
 typealias TripleHashMap<T, U, V> = HashMap<T, Pair<U, V>>
+
+typealias BeforeHookChange<T> = (T, T, Boolean) -> Boolean
+typealias OnHookChange<T> = (T, T) -> Unit
+
+typealias BeforeHookChangeMutableList<T> = MutableList<Pair<IPlugin, BeforeHookChange<T>>>
+typealias OnHookChangeMutableList<T> = MutableList<Pair<IPlugin, OnHookChange<T>>>
+typealias BeforeHookChangeList<T> = List<Pair<IPlugin, BeforeHookChange<T>>>
+typealias OnHookChangeList<T> = List<Pair<IPlugin, OnHookChange<T>>>
+
+typealias GurrenOutputFormat = (GurrenOutput) -> Unit
+typealias GurrenOutput = Pair<Array<String>, Array<Array<String>>>
+
+typealias GurrenScope = Pair<String, String>
+
+val GurrenScope.print: String
+    get() = first
+val GurrenScope.operationScope: String
+    get() = second
 
 fun byteArrayOfInts(vararg ints: Int): ByteArray = ints.map { it.toByte() }.toByteArray()
 
