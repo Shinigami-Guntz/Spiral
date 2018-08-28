@@ -10,6 +10,10 @@ import org.abimon.spiral.core.utils.DataHandler
 import org.abimon.spiral.modding.ModManager
 import org.abimon.spiral.modding.PluginManager
 import org.abimon.spiral.mvc.gurren.Gurren
+import org.jline.terminal.Terminal
+import org.jline.terminal.TerminalBuilder
+import java.util.logging.Level
+import java.util.logging.Logger
 
 fun main(args: Array<String>) = startupSpiral(parseArgs(args))
 
@@ -36,6 +40,8 @@ fun startupSpiral(args: GurrenArgs) {
     if (!args.disableUpdateCheck) {
         //
     }
+
+    Logger.getLogger("org.jline").level = Level.OFF
 
     while (true) {
         try {

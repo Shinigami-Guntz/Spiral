@@ -7,8 +7,10 @@ import org.abimon.imperator.impl.InstanceOrder
 import org.parboiled.Rule
 import org.parboiled.parserunners.ReportingParseRunner
 
-open class ParboiledSoldier(val rule: Rule, val scope: String? = null, private val watchtowers: Collection<Watchtower>, val command: (List<Any>) -> Unit) : Soldier {
-    constructor(rule: Rule, scope: String? = null, command: (List<Any>) -> Unit) : this(rule, scope, java.util.Collections.singletonList(ParboiledWatchtower(rule, scope)), command)
+open class ParboiledSoldier(val rule: Rule, val scope: String? = null, _helpOutput: Array<String> = emptyArray(), private val watchtowers: Collection<Watchtower>, val command: (List<Any>) -> Unit) : Soldier, GurrenCommand {
+    constructor(rule: Rule, scope: String? = null, helpOutput: Array<String> = emptyArray(), command: (List<Any>) -> Unit) : this(rule, scope, helpOutput, java.util.Collections.singletonList(ParboiledWatchtower(rule, scope)), command)
+
+    override val helpOutput: Array<String> = _helpOutput.copyOf(3).map { str -> str ?: "" }.toTypedArray()
 
     override fun command(order: Order) {
         when (order) {

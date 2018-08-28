@@ -45,7 +45,9 @@ dependencies {
     }
 
     compile "org.parboiled:parboiled-java:1.1.8"
-    compile "com.jakewharton.fliptables:fliptables:1.0.2"
+    compile 'com.mitchtalmadge:ascii-data:1.2.0'
+    compile 'org.jline:jline-terminal:3.8.1'
+    compile 'org.jline:jline-terminal-jna:3.8.1'
     compile "com.github.kittinunf.fuel:fuel:1.11.0"
 
     compile "org.codehaus.woodstox:woodstox-core-asl:4.4.1"

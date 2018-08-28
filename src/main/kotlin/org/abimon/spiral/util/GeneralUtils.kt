@@ -30,6 +30,9 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.regex.Pattern
 import kotlin.reflect.KFunction
+import java.util.StringTokenizer
+
+
 
 operator fun SemanticVersion.compareTo(semver: SemanticVersion): Int {
     if (this.first > semver.first)
@@ -116,19 +119,42 @@ fun IArchive.fileSourceForname(name: String): (() -> InputStream)? {
 val File.absoluteParentFile: File
     get() = File(absolutePath.substringBeforeLast(File.separator))
 
-fun String.splitOutside(delimiter: String = "\\s", cap: Int = 0, group: StringGroup = StringGroups.SPEECH): Array<String> {
-    val strings = ArrayList<String>()
-    val m = Pattern.compile("${group.start}[^${group.end}\\\\]*(?:\\\\.[^${group.end}\\\\]*)*${group.end}|[^$delimiter]+").matcher(this)
-    while (m.find()) {
-        val param = m.group(0)
+fun Array<Array<String>>.addLinebreaks(startingLength: Int, vararg indiceOrder: Int): Array<Array<String>> {
+    val lengths = IntArray(indiceOrder.size) { startingLength }
 
-        if (param[0] == '"')
-            strings.add(param.substring(1, param.length - 1).removeEscapes())
-        else
-            strings.add(param.removeEscapes())
+    for (i in 0 until indiceOrder.size - 1) {
+        val maxLength = minOf(this.maxBy { array -> array[indiceOrder[i]].length }?.get(indiceOrder[i])?.length ?: Int.MAX_VALUE, lengths[i])
+        lengths[i + 1] += (lengths[i] - maxLength)
+        lengths[i] = maxLength
     }
 
-    return strings.toTypedArray()
+    lengths[indiceOrder.size - 1] = minOf(this.maxBy { array -> array[indiceOrder[indiceOrder.size - 1]].length }?.get(indiceOrder[indiceOrder.size - 1])?.length ?: Int.MAX_VALUE, lengths[indiceOrder.size - 1])
+
+    forEach { array ->
+        indiceOrder.forEachIndexed { index, i ->
+            array[i] = array[i].addLinebreaks(lengths[index])
+        }
+    }
+
+    return this
+}
+
+//Temporarily taken from https://stackoverflow.com/a/7528259
+fun String.addLinebreaks(maxLineLength: Int): String {
+    val tok = StringTokenizer(this, " ")
+    val output = StringBuilder(length)
+    var lineLen = 0
+    while (tok.hasMoreTokens()) {
+        val word = tok.nextToken()
+
+        if (lineLen + word.length > maxLineLength) {
+            output.append("\n")
+            lineLen = 0
+        }
+        output.append("$word ")
+        lineLen += word.length
+    }
+    return output.toString()
 }
 
 fun TXREntry.readTexture(srdv: () -> InputStream): BufferedImage? {

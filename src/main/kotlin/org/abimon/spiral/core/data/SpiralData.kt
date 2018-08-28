@@ -31,10 +31,10 @@ import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 
 object SpiralData {
-    val billingDead = true
-    val JENKINS_PATH = "http://jenkins-ci.abimon.org:8666"
-    val JENKINS_PROJECT_NAME = "SPIRAL-MVC"
-    val JENKINS_PROJECT_FILE = "$JENKINS_PROJECT_NAME-all.jar"
+    const val billingDead = true
+    const val JENKINS_PATH = "https://jenkins.abimon.org"
+    const val JENKINS_PROJECT_NAME = "SPIRAL-MVC"
+    const val JENKINS_PROJECT_FILE = "$JENKINS_PROJECT_NAME-all.jar"
 
     val nonstopOpCodes = hashMapOf(
             0x00 to "TextID",
